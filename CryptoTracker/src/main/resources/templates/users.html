@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="ISO-8859-1">
+	<title>Portfolio</title>
+	<link rel="stylesheet" type="text/css" href="/webjars/bootstrap/css/bootstrap.min.css" />
+	<script type="text/javascript" src="/webjars/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="/webjars/bootstrap/js/bootstrap.min.js"></script>
+</head>
+<body>
+	<div><img src="https://i.imgur.com/NajByIi.jpg" alt="" height=75 width=250></img> </div>
+
+	<div class="container text-right"> 
+		<div>
+			<form th:action="@{/logout}" method="post">			
+				<input type="submit" value="Sign Out" />
+			</form>
+		</div>
+	</div>
+<div class="container text-center">		
+	<div>
+		<h1>[[${#request.userPrincipal.principal.fullName}]]'s Portfolio</h1>
+	</div>
+
+
+	<h3><a th:href="@{/market}">Market</a></h3>
+	<h1>Balance: $<a th:text="${total}"></a></h1>
+	<h3 style="color: green;">Profit +$<a th:text="${difference}"></a></h3>
+	<div>
+		<table class="table table-striped table-bordered">
+			<thead class="thead-dark">
+				<tr>
+					<th>Asset</th>
+					<th>Amount</th>
+					<th>Price</th>
+					<th>Value Now</th>
+					<th>Profit</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="asset: ${assets}" >
+					<td th:text="${asset.name}"></td>
+					<td th:text="${asset.amount}"></td>
+					<td th:text="${asset.price}"></td>
+					<td th:text="${asset.valueNow}"></td>
+					<td th:text="${asset.valueMade}"></td>
+				</tr>
+			</tbody> 
+		</table>
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+			Add Asset
+		  </button>
+	</div>
+	<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered" role="document">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title" id="exampleModalLongTitle">Add an asset</h5>
+			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			  </button>
+			</div>
+			<div class="modal-body">
+				<form id = "addAsset">	
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+						  <label class="input-group-text" for="inputGroupSelect01">Options</label>
+						</div>
+						<select id="name" class="custom-select">
+						  <option selected>Coin</option>
+						  <option value="1">BTC</option>
+						  <option value="2">ETH</option>
+						  <option value="3">USDT</option>
+						  <option value="4">BNB</option>
+						  <option value="5">USDC</option>
+						  <option value="6">XRP</option>
+						  <option value="7">ADA</option>
+						  <option value="8">DOGE</option>
+						</select>
+					</div>			
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+						  <span class="input-group-text" id="inputGroup-sizing-default">Amount</span>
+						</div>
+						<input id="amountName" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+					</div>
+					<div class="input-group mb-3">
+						<div class="input-group-prepend">
+						  <span class="input-group-text" id="inputGroup-sizing-default">Price</span>
+						</div>
+						<input id="priceName" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-default">
+					</div>					
+				  </form>
+
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			  <button id="addAssetBtn" type="submit" value="submit" class="btn btn-primary">Add Asset</button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	
+</div>
+
+<script>
+
+	
+			$(document).ready(function() {
+		
+  			// when the "Add Asset" button is clicked
+			  $("#addAssetBtn").on("click",function(event){
+					// get the form data
+					event.preventDefault();
+					modalData = {
+						"coin": $("#name").val(),
+						"amount": $("#amountName").val(),
+						"price": $("#priceName").val()
+			  			}
+
+					$("#addAssetBtn").prop("disabled", true);
+
+					console.log(modalData);
+				
+					$.ajax({
+							type:"GET",
+							url:"/addAsset",
+							data: modalData,							
+							success: function(result){
+								console.log("In success")	
+								location.reload()						
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								// handle error response from the server
+								console.log("not In success")							
+								console.log(textStatus + ": " + errorThrown);
+							}
+					});
+				  });
+				});
+		</script>
+	</body>
+</html>
